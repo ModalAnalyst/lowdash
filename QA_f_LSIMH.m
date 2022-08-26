@@ -42,19 +42,16 @@ cs = fcn_getFFTcoeffs(dt,u);
 % Compute exact solution with LSIMH using a large time step
 [y0,t0,~,u0] = f_LSIMH(A,B(:,j),C(i,:),D(i,j),cs,T*2/(2*NH-1),x0,NH);
 
-% Compare solution with LSIMP (approximate)
-[y1,t1] = f_LSIMP(A,B(:,j),C(i,:),D(i,j),u,dt,x0,3);
-
 % Compare solution with ode45 (approximate)
 ufcn = griddedInterpolant(t,u,'linear'); % build interpolant
-[t2,x] = ode45(@ssfun,t,x0,odeset('MaxStep',dt),A,B(:,j),ufcn); % integrate states
-y2 = x*C(i,:).'+u*D(i,j); % compute outputs
+[t1,x] = ode45(@ssfun,t,x0,odeset('MaxStep',dt),A,B(:,j),ufcn); % integrate states
+y1 = x*C(i,:).'+u*D(i,j); % compute outputs
 
 % Compare
 figure
-plot(t2,y2,'-',t1,y1,'--',t0,real(y0),'.k')
+plot(t1,y1,'-',t0,real(y0),'.')
 ylabel('Response'), xlabel('Time [s]'), grid on
-legend('ode45','LSIMP','LSIMH')
+legend('ode45','LSIMH')
 
 function cw = fcn_getFFTcoeffs(dt,u)
 % Example function for extracting FFT coefficients of input vector
