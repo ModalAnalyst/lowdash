@@ -1,0 +1,264 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>How to use f_LSIMH</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-08-30"><meta name="DC.source" content="doc_f_LSIMH.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>How to use f_LSIMH</h1><!--introduction--><p><tt>f_LSIMH</tt> computes the <i>exact</i> response of an LTI system subject to complex exponential input (harmonic functions, decaying sines, decaying exponentials). The excitation can be preprocessed in frequency-domain to remove undesired or low frequency components. The solution is correct independently from step size and provides the reference solution for other methods; its reference provides the mathematical details.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Define model</a></li><li><a href="#3">Define parameters</a></li><li><a href="#7">Calculate response</a></li><li><a href="#9">Plot results</a></li><li><a href="#11">Auxiliary functions</a></li></ul></div><h2 id="1">Define model</h2><p>Load 4-DoF system from <a href="https://www.mathworks.com/matlabcentral/fileexchange/68657-ooma-toolbox">https://www.mathworks.com/matlabcentral/fileexchange/68657-ooma-toolbox</a></p><pre class="codeinput">clc, close <span class="string">all</span>
+m = 10*ones(1,4);
+d = 10*ones(1,4);
+k = 10000*ones(1,4);
+
+M = diag(m);
+K = [k(1)+k(2) -k(2)       0          0 ;<span class="keyword">...</span>
+    -k(2)       k(2)+k(3) -k(3)       0 ;<span class="keyword">...</span>
+     0         -k(3)       k(3)+k(4) -k(4) ;
+     0          0         -k(4)       k(4)];
+D = [d(1)+d(2) -d(2)       0          0 ;<span class="keyword">...</span>
+    -d(2)       d(2)+d(3) -d(3)       0 ;<span class="keyword">...</span>
+     0         -d(3)       d(3)+d(4) -d(4) ;
+     0          0         -d(4)       d(4)];
+</pre><p>convert the MDK system into state-space model</p><pre class="codeinput">[A,B,C,D] = aux_mdk2ss(M,D,K);
+</pre><h2 id="3">Define parameters</h2><p>Define channels of interests and initial conditions</p><pre class="codeinput">i = 1; j = 2; <span class="comment">% desired output (response) and input (excitation) channels</span>
+x0 = zeros(size(A,1),1); x0(1) = .1; <span class="comment">% initial conditions</span>
+</pre><p>Define simulation duration</p><pre class="codeinput">T = 5; <span class="comment">% duration of the</span>
+N = 2001; <span class="comment">% number of time steps for ode45</span>
+NH = 51; <span class="comment">% number of time steps for LSIMH (independent of time step)</span>
+</pre><p>Define input vector</p><pre class="codeinput">dt = T/(N-1); <span class="comment">% time step</span>
+t = (0:N-1).'*dt; <span class="comment">% time axis</span>
+u = 10000*(cos(12*2*pi/T*t) + sin(20*2*pi/T*t)); <span class="comment">% some harmonic excitation</span>
+</pre><p><tt>f_LSIMH</tt> does not take a input vector, but its representation as a sum of complex exponentials. These can be taken as the FFT coefficients of the input vector, which is a good approach for harmonic functions. However, if the input contains decaying sines or there is leakage, then many FFT coefficients are obtained. Assuming the input is known exactly (for example for gust excitation or the discharge of an electric component), better accuracy and faster computations are obtained by providing its coefficients directly (see <tt>help f_LSIMH</tt>):</p><pre class="codeinput">cs = aux_getFFTcoeffs(dt,u);
+</pre><h2 id="7">Calculate response</h2><p>Compute the <i>exact</i> solution with <tt>f_LSIMH</tt> using a large time step:</p><pre class="codeinput">[y0,t0,~,u0] = f_LSIMH(A,B(:,j),C(i,:),D(i,j),cs,T*2/(2*NH-1),x0,NH);
+</pre><p>Compare solution with <tt>ode45</tt> (approximate) using a short time step:</p><pre class="codeinput">ufcn = griddedInterpolant(t,u,<span class="string">'linear'</span>); <span class="comment">% build interpolant</span>
+[t1,x] = ode45(@aux_ssfun,t,x0,odeset(<span class="string">'MaxStep'</span>,dt),A,B(:,j),ufcn); <span class="comment">% integrate states</span>
+y1 = x*C(i,:).'+u*D(i,j); <span class="comment">% compute outputs</span>
+</pre><h2 id="9">Plot results</h2><p>Compare the two solutions. The <tt>f_LSIMH</tt></p><pre class="codeinput">figure
+plot(t1,y1,<span class="string">'-'</span>,t0,real(y0),<span class="string">'.'</span>)
+ylabel(<span class="string">'Response [unit]'</span>), xlabel(<span class="string">'Time [s]'</span>), grid <span class="string">on</span>
+legend(<span class="string">'ode45'</span>,<span class="string">'LSIMH'</span>)
+</pre><img vspace="5" hspace="5" src="doc_f_LSIMH_01.png" alt=""> <p><tt>f_LSIMH</tt> can be used for computing the exact response to multi-sine random-phase excitation independently of step size.</p><h2 id="11">Auxiliary functions</h2><pre class="codeinput"><span class="keyword">function</span> cw = aux_getFFTcoeffs(dt,u)
+<span class="comment">% Example function for extracting FFT coefficients of input vector</span>
+<span class="comment">% Exact when u is a harmonic function and there is no leakage</span>
+TollPeriodicity = 100*eps;
+TollAmplitude = 100*eps;
+
+<span class="keyword">if</span> norm(u(1,:)-u(end,:))/norm(u(1,:))&lt;TollPeriodicity, u(end,:) = []; <span class="keyword">end</span>
+L = size(u,1); <span class="comment">% length of excitation ~= N (simulation length)</span>
+c = fft(u) / L;
+dtu = dt;
+
+<span class="comment">% Double-sided frequency vector</span>
+<span class="keyword">if</span> mod(L,2)
+   w = 0:(L+1)/2-1;
+<span class="keyword">else</span>
+   w = 0:L/2;
+<span class="keyword">end</span>
+w = 2*pi/dtu/(L-1)*[w,-w(end+mod(L,2)-1:-1:2)].';
+
+<span class="comment">% Remove frequency bins with low amplitudes</span>
+idx = all(abs(c)./max(abs(c))&lt;TollAmplitude,2);
+c(idx,:) = []; w(idx) = [];
+
+<span class="comment">% Output</span>
+cw = [c,1i*w];
+<span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">function</span> dx = aux_ssfun(t,x,A,B,ufcn)
+u = ufcn(t); <span class="comment">% evaluate excitation at integrator time</span>
+dx = A*x + B*u; <span class="comment">% state equation</span>
+<span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">function</span> [A,B,C,D] = aux_mdk2ss(M,D,K)
+Nm = size(M,1);
+A = [zeros(Nm),eye(Nm);-M\K,-M\D];
+B = [zeros(Nm);M\eye(Nm)];
+C = [eye(Nm),zeros(Nm)];
+D = zeros(Nm);
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% How to use f_LSIMH
+% |f_LSIMH| computes the _exact_ response of an LTI system subject to
+% complex exponential input (harmonic functions, decaying sines, decaying
+% exponentials). The excitation can be preprocessed in frequency-domain to
+% remove undesired or low frequency components. The solution is correct
+% independently from step size and provides the reference solution for
+% other methods; its reference provides the mathematical details.
+
+%% Define model
+% Load 4-DoF system from <https://www.mathworks.com/matlabcentral/fileexchange/68657-ooma-toolbox>
+clc, close all
+m = 10*ones(1,4);
+d = 10*ones(1,4);
+k = 10000*ones(1,4);
+
+M = diag(m);
+K = [k(1)+k(2) -k(2)       0          0 ;...
+    -k(2)       k(2)+k(3) -k(3)       0 ;...
+     0         -k(3)       k(3)+k(4) -k(4) ;
+     0          0         -k(4)       k(4)];
+D = [d(1)+d(2) -d(2)       0          0 ;...
+    -d(2)       d(2)+d(3) -d(3)       0 ;...
+     0         -d(3)       d(3)+d(4) -d(4) ;
+     0          0         -d(4)       d(4)];
+  
+%%
+% convert the MDK system into state-space model
+[A,B,C,D] = aux_mdk2ss(M,D,K);
+
+%% Define parameters
+% Define channels of interests and initial conditions
+i = 1; j = 2; % desired output (response) and input (excitation) channels
+x0 = zeros(size(A,1),1); x0(1) = .1; % initial conditions
+
+%%
+% Define simulation duration
+T = 5; % duration of the 
+N = 2001; % number of time steps for ode45
+NH = 51; % number of time steps for LSIMH (independent of time step)
+
+%%
+% Define input vector
+dt = T/(N-1); % time step
+t = (0:N-1).'*dt; % time axis
+u = 10000*(cos(12*2*pi/T*t) + sin(20*2*pi/T*t)); % some harmonic excitation
+
+%%
+% |f_LSIMH| does not take a input vector, but its representation as a sum
+% of complex exponentials. 
+% These can be taken as the FFT coefficients of the input vector, which is
+% a good approach for harmonic functions.
+% However, if the input contains decaying sines or there is leakage, then
+% many FFT coefficients are obtained.
+% Assuming the input is known exactly (for example for gust excitation or
+% the discharge of an electric component), better accuracy and faster
+% computations are obtained by providing its coefficients directly (see
+% |help f_LSIMH|):
+cs = aux_getFFTcoeffs(dt,u);
+
+%% Calculate response
+% Compute the _exact_ solution with |f_LSIMH| using a large time step:
+[y0,t0,~,u0] = f_LSIMH(A,B(:,j),C(i,:),D(i,j),cs,T*2/(2*NH-1),x0,NH);
+
+%%
+% Compare solution with |ode45| (approximate) using a short time step:
+ufcn = griddedInterpolant(t,u,'linear'); % build interpolant
+[t1,x] = ode45(@aux_ssfun,t,x0,odeset('MaxStep',dt),A,B(:,j),ufcn); % integrate states
+y1 = x*C(i,:).'+u*D(i,j); % compute outputs
+
+%% Plot results
+% Compare the two solutions. The |f_LSIMH| 
+figure
+plot(t1,y1,'-',t0,real(y0),'.')
+ylabel('Response [unit]'), xlabel('Time [s]'), grid on
+legend('ode45','LSIMH')
+
+%%
+% |f_LSIMH| can be used for computing the exact response to multi-sine
+% random-phase excitation independently of step size.
+
+%% Auxiliary functions
+function cw = aux_getFFTcoeffs(dt,u)
+% Example function for extracting FFT coefficients of input vector
+% Exact when u is a harmonic function and there is no leakage
+TollPeriodicity = 100*eps;
+TollAmplitude = 100*eps;
+
+if norm(u(1,:)-u(end,:))/norm(u(1,:))<TollPeriodicity, u(end,:) = []; end
+L = size(u,1); % length of excitation ~= N (simulation length)
+c = fft(u) / L;
+dtu = dt;
+
+% Double-sided frequency vector
+if mod(L,2)
+   w = 0:(L+1)/2-1;
+else
+   w = 0:L/2;
+end
+w = 2*pi/dtu/(L-1)*[w,-w(end+mod(L,2)-1:-1:2)].';
+
+% Remove frequency bins with low amplitudes
+idx = all(abs(c)./max(abs(c))<TollAmplitude,2);
+c(idx,:) = []; w(idx) = [];
+
+% Output
+cw = [c,1i*w];
+end
+%%
+function dx = aux_ssfun(t,x,A,B,ufcn)
+u = ufcn(t); % evaluate excitation at integrator time
+dx = A*x + B*u; % state equation
+end
+%%
+function [A,B,C,D] = aux_mdk2ss(M,D,K)
+Nm = size(M,1);
+A = [zeros(Nm),eye(Nm);-M\K,-M\D]; 
+B = [zeros(Nm);M\eye(Nm)]; 
+C = [eye(Nm),zeros(Nm)]; 
+D = zeros(Nm);
+end
+
+
+##### SOURCE END #####
+--></body></html>

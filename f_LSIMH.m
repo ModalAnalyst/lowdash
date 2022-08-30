@@ -18,6 +18,7 @@ function [y,t,x,u,Info] = f_LSIMH(A,B,C,D,cs,dt,x0,N)
 % t    [N 1] time vector
 % x    [N,Nx] states
 % u    [N,Nu] excitation
+% Info meadata
 %
 % EXCITATION DEFINITION: 
 % LSIM-H.m assumes that the input is in the form u(t) = sum c*exp(s*t).
@@ -31,16 +32,16 @@ function [y,t,x,u,Info] = f_LSIMH(A,B,C,D,cs,dt,x0,N)
 % can be applied.
 %
 % SYNTAX:
-% [] = f_LSIMH free decay of 1-DoF harmonic oscillator, wn = 1 rad/s, zeta = 0.01, x0 = [1 0];
-% [] = f_LSIMH(A) free decay with x0 = [1 0 ... 0];
-% [] = f_LSIMH(A,B) response to cs=cosine on input 1
-% [] = f_LSIMH(A,B,C) response to cs=cosine on input 1
-% [] = f_LSIMH(A,B,C,D) response to cs=cosine on input 1
-% [] = f_LSIMH(...,cs = [1/2i w ; -1/2i -w) input is sin(w*t)
-% [] = f_LSIMH(...,cs = [1/2i w ; -1/2i -w ; 1/2 3*w ; 1/2 -3*w ;) input is sin(w*t)+cos(3*w*t)
-% [] = f_LSIMH(...,dt) given time step
-% [] = f_LSIMH(...,x0) given initial conditions
-% [] = f_LSIMH(...,N) given number of time steps
+% ... = f_LSIMH free decay of 1-DoF harmonic oscillator, wn = 1 rad/s, zeta = 0.01, x0 = [1 0];
+% ... = f_LSIMH(A) free decay with x0 = [1 0 ... 0];
+% ... = f_LSIMH(A,B) response to cs=cosine on input 1
+% ... = f_LSIMH(A,B,C) response to cs=cosine on input 1
+% ... = f_LSIMH(A,B,C,D) response to cs=cosine on input 1
+% ... = f_LSIMH(...,cs = [1/2i w ; -1/2i -w) input is sin(w*t)
+% ... = f_LSIMH(...,cs = [1/2i w ; -1/2i -w ; 1/2 3*w ; 1/2 -3*w ;) input is sin(w*t)+cos(3*w*t)
+% ... = f_LSIMH(...,dt) given time step
+% ... = f_LSIMH(...,x0) given initial conditions
+% ... = f_LSIMH(...,N) given number of time steps
 %
 % EXAMPLE:
 % % State-space model (https://de.mathworks.com/help/control/ug/mimo-state-space-models.html)

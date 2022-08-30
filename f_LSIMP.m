@@ -17,17 +17,19 @@ function [y,t,x,u,Info] = f_LSIMP(A,B,C,D,u,dt,x0,HO)
 % y    [size(u)-HO+1 Ny] outputs
 % t    [size(u)-HO+1 1] time vector
 % x    [size(u)-HO+1 Nx] states
+% u    input vector
+% Info metadata
 %
 % SYNTAX:
-% [y,t,x] = f_LSIMP free decay of 1-DoF harmonic oscillator, wn = 1 rad/s, zeta = 0.01, x0 = [1 0];
-% [y,t,x] = f_LSIMP(A) free decay with x0 = [1 0 ... 0];
-% [y,t,x] = f_LSIMP(A,B) response to u=randn(DefalutNumberOfSamples,1) on input 1
-% [y,t,x] = f_LSIMP(A,B,C) response to u=randn(DefalutNumberOfSamples,1) on input 1
-% [y,t,x] = f_LSIMP(A,B,C,D) response to u=randn(DefalutNumberOfSamples,1) on input 1
-% [y,t,x] = f_LSIMP(...,u) given input u
-% [y,t,x] = f_LSIMP(...,dt) given time step (performs check if adequate)
-% [y,t,x] = f_LSIMP(...,x0) given initial conditions
-% [y,t,x] = f_LSIMP(...,HO) given hold order (0, 1, 3)
+% ... = f_LSIMP free decay of 1-DoF harmonic oscillator, wn = 1 rad/s, zeta = 0.01, x0 = [1 0];
+% ... = f_LSIMP(A) free decay with x0 = [1 0 ... 0];
+% ... = f_LSIMP(A,B) response to u=ones(DefalutNumberOfSamples,1) on input 1
+% ... = f_LSIMP(A,B,C) response to u=ones(DefalutNumberOfSamples,1) on input 1
+% ... = f_LSIMP(A,B,C,D) response to u=ones(DefalutNumberOfSamples,1) on input 1
+% ... = f_LSIMP(...,u) given input u
+% ... = f_LSIMP(...,dt) given time step (performs check if adequate)
+% ... = f_LSIMP(...,x0) given initial conditions
+% ... = f_LSIMP(...,HO) given hold order (0, 1, 3)
 %
 % SIMILAR FUNCTIONALITY: MATLAB's lsim.m (Control System Toolbox)
 %
@@ -89,15 +91,15 @@ arguments
 end
 
 % Set defaults
-DefaultStateMatrix = [0 1; -1 , -.04]; % harmonic oscillator, omega = 1 rad/s, zeta = 0.02;
-DefaultNumberOfSamples = 100;
+DefaultStateMatrix = [0 1; -1 , -.1]; % harmonic oscillator, omega = 1 rad/s, zeta = 0.05;
+DefaultNumberOfSamples = 200;
 DefaultHoldOrder = 0;
 DefaultTimeStep = 0; % let the function chose dt
 
 % Check input
 if isempty(A), A = DefaultStateMatrix; end
 assert(size(A,1)==size(A,2),'f_LSIMP:StateMatrixSquare','The state matrix must be a square matrix')
-if isempty(B), B = eye(size(A,1)); end
+if isempty(B), B = zeros(size(A,1)); end
 assert(size(A,1)==size(B,1),'f_LSIMP:InputMatrixSize','The input matrix must have as many rows as there are in the state matrix')
 if isempty(C), C = eye(size(A)); end
 assert(size(C,2)==size(A,1),'f_LSIMP:OutputMatrixSize','The output matrix must have as many columns as there are in the state matrix')
@@ -106,7 +108,7 @@ assert(size(D,1)==size(C,1) && size(D,2)==size(B,2),'f_LSIMP:FeedthroughMatrixSi
 if isempty(u)
    u = zeros(DefaultNumberOfSamples,size(B,2));
    if any(B(:))
-      u(:,1) = randn(size(u,1),1);
+      u(:,1) = ones(size(u,1),1);
    elseif isempty(x0)
       x0 = zeros(size(A,1),1); 
       x0(1) = 1;
@@ -148,17 +150,18 @@ end
 
 function [dt,HO,kf] = aux_checkSampleRate(A,HO,dt,IsThereAnyInput)
 % Check sample rate, throw warning if it's inadequate
+maxL = eigs(sparse(A),1,'largestabs'); % use eigenvalues to determine if sample rate is adequate
+fNy = abs(maxL)/2/pi; % Nyquist frequency
 if IsThereAnyInput
    switch HO % oversampling factors from reference [1]
       case 0, kf = 2.841;
       case 1, kf = 4.016;
       case 3, kf = 1.818;
    end
-   maxL = eigs(sparse(A),1,'largestabs'); % use eigenvalues to determine if sample rate is adequate
-   fNy = abs(maxL)/2/pi; % Nyquist frequency
    if dt==0, dt = 1/fNy/kf/2; end
    dt0 = 1/fNy/2/kf;
 else
+   dt = 1/fNy/2 /1.005;
    dt0 = 0; % the zero-input response is exact
    kf = Inf;
 end
